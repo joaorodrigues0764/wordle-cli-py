@@ -2,7 +2,8 @@ import random
 
 def main():
     """
-    This is the main function. The heart of the game is in here!
+    Runs the game loop: pick a secret word, then give the player
+    six attempts to guess it.
     """
     words_list = load_words()
     secret_word = get_secret_word(words_list)
@@ -24,8 +25,8 @@ def main():
 
 def load_words():
     """
-    This function copys the words in the .txt file to a new list named as "words_list".
-    .strip() cuts of the '\n'
+    Reads words.txt line by line and returns them as a list.
+    strip() is used to remove the trailing newline from each line.
     """
     words_list = []
 
@@ -37,8 +38,7 @@ def load_words():
 
 def get_secret_word(words_list):
     """
-    This function uses "random" to choose a random word from the list.
-    That random word will be our secret word.
+    Picks a random word from the list to be the answer for this round.
     """
     secret_word = random.choice(words_list)
 
@@ -46,8 +46,9 @@ def get_secret_word(words_list):
 
 def get_user_guess(words_list):
     """
-    This function asks the player for his guess and makes sure that the guess is valid.
-    The .strip() eliminates the spaces and the .lower() converts every letters into lowercase.
+    Keeps asking the player for a guess until it's a valid one:
+    exactly 5 letters and present in the word list. strip() removes
+    extra whitespace and lower() normalizes the casing.
     """
     while True:
         user_guess = input("Enter your word: ").strip().lower()
@@ -60,9 +61,10 @@ def get_user_guess(words_list):
                                                                                                     
 def evaluate_guess(secret_word, user_guess):
     """
-    This function compares each letter of the secret_word and user_guess and determines
-    wether it must be paint in green, yellow or gray.
-    When it finishes, it displays the result so the player can see how he did.
+    Compares the guess against the secret word letter by letter and
+    prints it back with color highlighting: green for a correct
+    letter in the correct spot, yellow for a correct letter in the
+    wrong spot, and gray for a letter that isn't in the word at all.
     """
     secret_word_list = list(secret_word)
     user_guess_list = list(user_guess)
@@ -74,6 +76,8 @@ def evaluate_guess(secret_word, user_guess):
     GRAY = "\033[100m\033[97m"
     RESET = "\033[0m"
 
+    # First pass: mark exact matches (green) and remove them from
+    # secret_word_list so they don't get reused as yellow matches later.
     i = 0
     while i < 5:
         if secret_word_list[i] == user_guess_list[i]:
@@ -81,6 +85,9 @@ def evaluate_guess(secret_word, user_guess):
             secret_word_list[i] = '_'
         i += 1
 
+    # Second pass: for the letters that weren't exact matches, check
+    # if they still appear somewhere else in the secret word (yellow),
+    # otherwise mark them as not present (gray).
     i = 0
     while i < 5:
         if result[i] == "":
